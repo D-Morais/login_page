@@ -11,13 +11,29 @@ def init_db():
     cursor.execute(
         """ 
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            email TEXT NOT NULL UNIQUE, 
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(50) NOT NULL UNIQUE,
+            password VARCHAR(100) NOT NULL,
+            email VARCHAR(100) NOT NULL UNIQUE,
+            created_at TEXT DEFAULT (DATE('now')),
+            updated_at TEXT DEFAULT (DATE('now'))
         );
         """
     )
+
+    cursor.execute(
+        """
+        CREATE TRIGGER IF NOT EXISTS update_date
+        AFTER UPDATE ON users
+        FOR EACH ROW
+        BEGIN
+            UPDATE users
+            SET updated_at = DATE('now')
+            WHERE id = OLD.id;
+        END;
+        """
+    )
+
     conexao.commit()
     conexao.close()
 
@@ -41,7 +57,7 @@ def adc_user(name, password_user, email_user):
         conexao.close()
 
 
-def update_user(name, new_password):
+def update_password(name, new_password):
     conexao = connect()
     cursor = conexao.cursor()
 
