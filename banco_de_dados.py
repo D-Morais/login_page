@@ -110,6 +110,34 @@ def search_user(name):
     cursor = conexao.cursor()
 
     cursor.execute(
+        """SELECT username FROM users WHERE username = ?;""", (name, )
+    )
+
+    user = cursor.fetchone()
+    conexao.close()
+
+    return user
+
+
+def search_email(name_email):
+    conexao = connect()
+    cursor = conexao.cursor()
+
+    cursor.execute(
+        """SELECT email FROM users WHERE email = ?;""", (name_email, )
+    )
+
+    email = cursor.fetchone()
+    conexao.close()
+
+    return email
+
+
+def verify_user(name):
+    conexao = connect()
+    cursor = conexao.cursor()
+
+    cursor.execute(
         """SELECT username, password FROM users WHERE username = ?;""", (name, )
     )
 

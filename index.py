@@ -20,7 +20,12 @@ app.layout = html.Div([
 )
 def display_page(pathname, user_data):
     if pathname == '/page_exemplo':
-        return page_exemplo.layout
+
+        if user_data and user_data.get('logged_in'):
+            return page_exemplo.layout
+
+        return login.layout
+
     else:
         return login.layout
 
