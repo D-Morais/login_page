@@ -1,5 +1,5 @@
 import bcrypt
-from banco_de_dados import search_user, search_email, adc_user
+from banco_de_dados import search_user, search_email, adc_user, verify_user
 
 
 def encrypt(password):
@@ -21,3 +21,12 @@ def create_user(user, password, email):
 
     adc_user(user, password, email)
     return f"Usuário adicionado com sucesso!", "success", "", "", ""
+
+
+def login_user(username, password):
+    user_log = verify_user(username)
+    verify = verify_password(password, user_log[1])
+
+    if verify:
+        return user_log[0]
+    return False

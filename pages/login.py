@@ -1,8 +1,6 @@
-import dash
-from dash.exceptions import PreventUpdate
-from dash import html
-from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
+from dash import html, no_update
+from dash.dependencies import Input, Output, State
 
 from app import *
 from utils import encrypt, create_user
@@ -17,16 +15,16 @@ layout = dbc.Container([
             html.Div(style={"height": "40px"}),
         ]),
         dbc.FormFloating([
-            dbc.Input(type="text", placeholder="Digite seu usuário", id="usuario"),
+            dbc.Input(type="text", placeholder="Digite seu usuário", id="user"),
             dbc.Label("Usuário")
         ], style={"margin": "15px"}),
         dbc.FormFloating([
-            dbc.Input(type="password", placeholder="Digite sua senha", id="senha"),
+            dbc.Input(type="password", placeholder="Digite sua senha", id="password"),
             dbc.Label("Senha")
         ], style={"margin": "15px"}),
         dbc.Row([
-            dbc.Button("Acessar", color="primary", id="acessar", style={"width": "25%"}, n_clicks=0),
-            dbc.Button("Novo Usuário", color="success", id="novo_usuario", style={"width": "30%"}, n_clicks=0)
+            dbc.Button("Acessar", color="primary", id="access", style={"width": "25%"}, n_clicks=0),
+            dbc.Button("Novo Usuário", color="success", id="new-user", style={"width": "30%"}, n_clicks=0)
         ], style={"margin": "15px", "flex-direction": "row", "justify-content": "space-between"}),
         html.Div(id="login-output", className="mt-2")
     ], style={"width": "40%", "margin-top": "60px", "background-color": "#f1f1f1"}),
@@ -40,18 +38,18 @@ layout = dbc.Container([
                 html.Div(style={"height": "40px"})
             ]),
             dbc.FormFloating([
-                dbc.Input(type="text", placeholder="", id="reg-usuario"),
+                dbc.Input(type="text", placeholder="", id="reg-user"),
                 dbc.Label("Novo usuário")
             ], style={"margin": "15px"}),
             dbc.FormFloating([
-                dbc.Input(type="password", placeholder="", id="reg-senha"),
+                dbc.Input(type="password", placeholder="", id="reg-password"),
                 dbc.Label("Escolha sua senha")
             ], style={"margin": "15px"}),
             dbc.FormFloating([
                 dbc.Input(type="email", placeholder="", id="reg-email"),
                 dbc.Label("Insira seu e-mail")
             ], style={"margin": "15px"}),
-            dbc.Button("Adicionar", color="primary", id="adc-usuario",
+            dbc.Button("Adicionar", color="primary", id="adc-user",
                        style={"width": "30%", "display": "block", "margin": "auto auto"},
                        n_clicks=0),
             html.Div(id='reg-output-state', className="mt-2")
@@ -64,7 +62,7 @@ layout = dbc.Container([
 
 @app.callback(
     Output('modal', 'style'),
-    [Input('novo_usuario', 'n_clicks'),
+    [Input('new-user', 'n_clicks'),
      Input('close-modal', 'n_clicks')],
     State('modal', 'style')
 )
@@ -79,30 +77,30 @@ def toggle_modal(reg_clicks, close_clicks, current_style):
 @app.callback(
     [
         Output('reg-output-state', 'children'),
-        Output("reg-usuario", "value"),
-        Output("reg-senha", "value"),
+        Output("reg-user", "value"),
+        Output("reg-password", "value"),
         Output("reg-email", "value")
     ],
-    Input('adc-usuario', 'n_clicks'),
+    Input('adc-user', 'n_clicks'),
     [
-        State('reg-usuario', 'value'),
-        State('reg-senha', 'value'),
+        State('reg-user', 'value'),
+        State('reg-password', 'value'),
         State('reg-email', 'value')
     ],
 )
-def adc_novo_usuario(n_clicks, novo_usuario, nova_senha, novo_email):
+def adc_novo_usuario(n_clicks, new_user, new_password, new_email):
     if n_clicks:
 
-        if not novo_email or not novo_usuario or not nova_senha:
+        if not new_email or not new_user or not new_password:
             return dbc.Alert("Necessário preencher todos os campos.", color="warning", is_open=True, duration=2000), \
-                   novo_usuario, nova_senha, novo_email
+                   new_user, new_password, new_email
 
         else:
-            hash_senha = encrypt(nova_senha)
-            message, color, return_user, return_password, return_email = create_user(novo_usuario, hash_senha,
-                                                                                     novo_email)
-            return dbc.Alert(f"{message}", color=color, is_open=True, duration=2000), \
-                   return_user, return_password, return_email
+            hash_password = encrypt(new_password)
+            message, color, return_user, return_password, return_email = create_user(new_user, hash_password,
+                                                                                     new_email)
+            return dbc.Alert(f"{message}", color=color, is_open=True, duration=2000), return_user, return_password,\
+                return_email
 
     else:
-        return dash.no_update
+        return no_update
